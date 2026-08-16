@@ -14,7 +14,7 @@ Building a Batch Application with Java Spring Batch
 A Spring Boot + Spring Batch application that reads unbilled water meter
 readings from a database table, prices each into a bill (every line item a
 standard printed statement shows), writes the bill to a `bills` table, and
-renders a matching PDF statement — all in one chunk-oriented job.
+renders a matching PDF statement -- all in one chunk-oriented job.
 
 ## How it works
 
@@ -45,22 +45,24 @@ transaction per chunk), so a re-run picks the reading back up cleanly.
 
 Two tables, defined in `src/main/resources/schema.sql`:
 
-- **`meter_readings`** — the source data: account/customer/meter info,
+- **`meter_readings`**
+    the source data: account/customer/meter info,
   previous & present reads, previous balance, net payments, and flags
   (`past_due`, `reclaimed_water_account`, `auto_pay`, `final_bill`). A
   `processed` boolean lets the reader's query (`WHERE processed = FALSE`)
   pick up only unbilled rows, so re-running the job is safe.
-- **`bills`** — one row per generated bill: every itemized charge, the
+- **`bills`**
+   one row per generated bill: every itemized charge, the
   summary-of-account fields, the computed `amount_due`, the `pdf_path` of
   the rendered statement, and `source_reading_id` (FK back to the reading
   it came from).
 
 `src/main/resources/data.sql` seeds `meter_readings` with 11 demo rows
-(mirroring the earlier CSV sample set — including a bad-data row and a
+(mirroring the earlier CSV sample set , including a bad-data row and a
 missing-customer-name row to exercise the skip/validation path). **Both
 scripts run automatically on startup** via `spring.sql.init.mode=always`.
 That's convenient for local dev (fresh data every run) but wrong for
-production — see "Moving to production" below.
+production , see "Moving to production" below.
 
 Spring Batch's own job/step execution history (the `BATCH_*` tables) lives
 in the *same* datasource, via `spring.batch.jdbc.initialize-schema=always`.
@@ -71,7 +73,7 @@ in the *same* datasource, via `spring.batch.jdbc.initialize-schema=always`.
   streaming `SELECT ... FROM meter_readings WHERE processed = FALSE ORDER BY id`,
   mapped to `MeterReading` by `MeterReadingRowMapper`.
 - **Validator + Processor** (`BillProcessor`): same tiered/flat-rate pricing
-  logic as before — Customer Service Charge, Purchase Water Pass-Thru, Water
+  logic as before , Customer Service Charge, Purchase Water Pass-Thru, Water
   Base/Usage Charge (tiered), Sewer Base/Usage Charge (capped), optional
   Reclaimed Water Charge, and a Late Payment Charge when the prior balance is
   past due. Rows with `present_read < previous_read` are filtered (returns
@@ -79,7 +81,7 @@ in the *same* datasource, via `spring.batch.jdbc.initialize-schema=always`.
   `ValidationException` (up to `skipLimit(50)`), not fatal to the run.
 - **`BillPdfWriter`**: renders the same one-page PDF statement layout as
   before (header identity bar, meter table, charges/summary columns,
-  consumption-history chart, payment stub) — now sourced from DB rows
+  consumption-history chart, payment stub) -- now sourced from DB rows
   instead of CSV.
 - **`billJdbcWriter`** / **`markReadingProcessedWriter`**:
   `JdbcBatchItemWriter<Bill>` beans, using named-parameter SQL bound
@@ -88,10 +90,10 @@ in the *same* datasource, via `spring.batch.jdbc.initialize-schema=always`.
 
 ## Rate schedule & branding
 
-Unchanged from before — both are `@ConfigurationProperties` beans
+Unchanged from before -- both are `@ConfigurationProperties` beans
 (`RateSchedule`, `UtilityBranding`) bound from `billing.rates.*` and
 `billing.utility.*` in `application.properties`. See that file for the full
-list of tunable rates (all placeholder values — replace with your utility's
+list of tunable rates (all placeholder values -- replace with your utility's
 actual approved tariff).
 
 ## Balance formula
@@ -139,9 +141,9 @@ java -jar target/water-billing-batch-1.0.0.jar
 ```
 
 Output:
-- `bills` table (H2 file DB at `./data/waterbilling.mv.db`) — query it with any
+- `bills` table (H2 file DB at `./data/waterbilling.mv.db`) -- query it with any
   H2-compatible client, or via the H2 console if you enable it.
-- `./output/bills/*.pdf` — one printable statement per account.
+- `./output/bills/*.pdf` -- one printable statement per account.
 - `meter_readings.processed` flipped to `TRUE` for every row that got billed.
 
 Run the tests only:
@@ -162,7 +164,7 @@ java -cp ~/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar org.h2.tools.
 
 - **Swap H2 for Postgres/MySQL**: change `spring.datasource.*` in
   `application.properties` and add the matching JDBC driver dependency to
-  `pom.xml` — nothing else in the code changes, since everything is plain
+  `pom.xml` -- nothing else in the code changes, since everything is plain
   JDBC (`JdbcCursorItemReader` / `JdbcBatchItemWriter`).
 - **Stop resetting data on startup**: delete `data.sql` (or set
   `spring.sql.init.mode=never`) and remove the `DROP TABLE` statements from
@@ -172,7 +174,7 @@ java -cp ~/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar org.h2.tools.
   are tracked over time instead of applied ad hoc.
 - **Loading real readings**: point whatever loads your meter-data-management
   (MDM) export at `meter_readings` (bulk INSERT, a scheduled ETL job, or a
-  CDC pipeline) — the batch job only cares that unbilled rows have
+  CDC pipeline) -- the batch job only cares that unbilled rows have
   `processed = FALSE`.
 - **Partition for scale**: for very large customer bases, add a partitioned
   step (e.g. by account-number range) so multiple threads/instances process
