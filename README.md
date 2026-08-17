@@ -139,6 +139,10 @@ Requires JDK 17+ and Maven.
 mvn clean package
 java -jar target/water-billing-batch-1.0.0.jar
 ```
+<img width="1130" height="832" alt="Screenshot_20260816_221731" src="https://github.com/user-attachments/assets/66244e64-331b-48cb-8bca-3f333d2a6e98" />
+
+<img width="1136" height="412" alt="Screenshot_20260816_205832-1" src="https://github.com/user-attachments/assets/449b1f9d-8b70-438e-a9f8-97e14e046511" />
+
 
 Output:
 - `bills` table (H2 file DB at `./data/waterbilling.mv.db`) -- query it with any
@@ -146,11 +150,13 @@ Output:
 - `./output/bills/*.pdf` -- one printable statement per account.
 - `meter_readings.processed` flipped to `TRUE` for every row that got billed.
 
+
 Run the tests only:
 
 ```bash
 mvn test
 ```
+<img width="1129" height="355" alt="Screenshot_20260816_210246" src="https://github.com/user-attachments/assets/a0106cf6-faea-4ddb-8904-9511b53d1b9e" />
 
 Inspect the results directly with the H2 shell:
 
@@ -159,6 +165,10 @@ java -cp ~/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar org.h2.tools.
   -url "jdbc:h2:file:./data/waterbilling" -user sa
 # then: SELECT account_number, amount_due, pdf_path FROM bills;
 ```
+
+<img width="920" height="790" alt="Screenshot_20260816_210512-2" src="https://github.com/user-attachments/assets/49545879-fd7f-4d63-820c-4ca8d3787ac5" />
+
+
 
 ## Moving to production
 
